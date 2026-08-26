@@ -81,3 +81,18 @@ CM4 carriers provide, directly or through a switch — it cannot enumerate at al
 
 Driving it from a Pi needs SDIO broken out to the 40-pin header (GPIO 22-27),
 which is what ALFA's APIM2 adapter is for.
+
+## Mainline mm81x has no monitor mode
+
+Confirmed against `drivers/net/wireless/morsemicro/mm81x` on master:
+
+- no `monitor.c` in the tree
+- `mac.c:2288` declares `interface_modes = BIT(NL80211_IFTYPE_AP) | BIT(NL80211_IFTYPE_STATION)`
+- the iface combination at `mac.c:127` lists the same two types
+
+So the in-tree driver landing in 7.3 covers station and AP but cannot sniff. The
+out-of-tree driver's monitor support lives in `monitor.c`, gated on
+`CONFIG_MORSE_MONITOR` (Kconfig default `n`), which is what creates the `morse0`
+capture interface via `alloc_netdev(0, "morse%d", ...)`.
+
+Practical consequence: even after 7.3, keep the out-of-tree driver for capture.

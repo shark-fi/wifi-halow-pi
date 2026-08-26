@@ -44,8 +44,15 @@ tracked whatever was oldstable at build time. Check the filename, not the path.
 `b1906cea0`, 2026-07-08, after the v7.2 merge window). It is in no released
 kernel yet — not 7.1, not 7.2. Once distributions ship 7.3+, MM8108 support
 becomes `CONFIG_MM81X_USB=m` with firmware already in linux-firmware under
-`morsemicro/mm81x/`, and the out-of-tree build in [mm8108/](mm8108/) becomes
-unnecessary. The Newracom NRC7292 has no mainline driver and no prospect of one.
+`morsemicro/mm81x/`.
+
+**But mainline has no monitor mode.** `mm81x` declares only
+`BIT(NL80211_IFTYPE_AP) | BIT(NL80211_IFTYPE_STATION)` (`mac.c:2288`) and ships
+no `monitor.c`. For sniffing you still need the out-of-tree driver built with
+`CONFIG_MORSE_MONITOR=y` — see [mm8108/](mm8108/). Mainline replaces the
+out-of-tree build for station and AP work only.
+
+The Newracom NRC7292 has no mainline driver and no prospect of one.
 
 ## Mirrors
 

@@ -20,7 +20,20 @@ v7.2-rc1 and v7.2, none contain it. Once 7.3 ships:
 - the board config is auto-selected from the chip's own board ID as
   `bcf_boardtype_%04x.bin`
 
-At that point nothing below is needed.
+At that point nothing below is needed **for station and AP work**.
+
+Sniffing is the exception. Mainline `mm81x` does not support monitor mode: it
+declares only
+
+```c
+hw->wiphy->interface_modes = BIT(NL80211_IFTYPE_AP) |
+                             BIT(NL80211_IFTYPE_STATION);   /* mac.c:2288 */
+```
+
+and there is no `monitor.c` in the mainline tree. Creating a monitor interface
+fails. Packet capture therefore still requires the out-of-tree driver built with
+`CONFIG_MORSE_MONITOR=y` — see [Monitor mode](#monitor-mode--sniffer-capture)
+below. Keep the out-of-tree build around for capture work even once 7.3 ships.
 
 ## Out-of-tree build (pre-7.3)
 
