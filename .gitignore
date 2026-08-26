@@ -3,3 +3,8 @@
 *.deb
 *.img
 *.img.xz
+
+# Wireshark profile files that carry secrets or machine state
+80211_keys
+recent
+recent_common

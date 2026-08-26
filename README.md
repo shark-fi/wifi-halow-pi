@@ -11,6 +11,10 @@ drivers, different constraints.
 | [ALFA AHPI7292S](nrc7292/) | Newracom NRC7292 | SPI (40-pin HAT) | **Verified working** — associates, monitor mode captures S1G beacons |
 | [Morse MM8108-EKH19](mm8108/) | Morse Micro MM8108 | USB | Scripted, **not yet verified end to end** |
 
+A [Wireshark profile](wireshark/) for analysing the captures is included: S1G
+coloring rules, filter buttons and S1G-aware columns, verified against six HaLow
+captures.
+
 ## Read this first
 
 **Use stock Raspberry Pi OS, not WLAN Pi OS.** WLAN Pi's kernel headers packages
@@ -60,5 +64,6 @@ mirrored:
 ```
 nrc7292/   ALFA AHPI7292S - setup, monitor mode, vendored blobs
 mm8108/    Morse MM8108 USB dongle - setup, station mode
+wireshark/ Wireshark profile for 802.11ah analysis
 notes/     Kernel packaging defects, compatibility research
 ```
