@@ -96,3 +96,8 @@ out-of-tree driver's monitor support lives in `monitor.c`, gated on
 capture interface via `alloc_netdev(0, "morse%d", ...)`.
 
 Practical consequence: even after 7.3, keep the out-of-tree driver for capture.
+This may change in a later kernel cycle - verify against the tree you are
+running by checking whether `mm81x` declares `NL80211_IFTYPE_MONITOR`:
+
+    grep -rn 'interface_modes' drivers/net/wireless/morsemicro/mm81x/mac.c
+    ls drivers/net/wireless/morsemicro/mm81x/monitor.c

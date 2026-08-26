@@ -34,6 +34,8 @@ and there is no `monitor.c` in the mainline tree. Creating a monitor interface
 fails. Packet capture therefore still requires the out-of-tree driver built with
 `CONFIG_MORSE_MONITOR=y` — see [Monitor mode](#monitor-mode--sniffer-capture)
 below. Keep the out-of-tree build around for capture work even once 7.3 ships.
+Upstream monitor support may arrive in a later cycle; it is not in 7.3, so
+check the tree you are actually running rather than assuming.
 
 ## Out-of-tree build (pre-7.3)
 
