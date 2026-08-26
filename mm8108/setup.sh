@@ -57,6 +57,10 @@ MAKE_ARGS=(
     CONFIG_WLAN_VENDOR_MORSE=m CONFIG_MORSE_USB=y
     CONFIG_MORSE_USER_ACCESS=y CONFIG_MORSE_VENDOR_COMMAND=y
     CONFIG_MORSE_DEBUGFS=y
+    # Kconfig defaults this to n. Without it monitor.o is not compiled and the
+    # morse0 capture interface never appears - which is the ONLY interface the
+    # sniffer procedure works from. See mm8108/monitor.sh.
+    CONFIG_MORSE_MONITOR=y
 )
 
 say "Building driver"

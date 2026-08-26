@@ -69,3 +69,48 @@ Morse's `wpa_supplicant/defconfig` already enables everything needed —
 The defconfig also sets `CONFIG_MORSE_5GHZ_MAPPED`, so scan output reports S1G
 channels in **5 GHz** numbering (the NRC7292 driver uses a 2.4 GHz mapping for
 the same reason). Use `morse_cli -i <iface> channel` for the real S1G channel.
+
+## Monitor mode / sniffer capture
+
+Follows Morse [APPNOTE-36](https://docs.morsemicro.com/application-notes/appnote-36-how-to-do-a-sniffer-capture).
+Run [`monitor.sh`](monitor.sh).
+
+Two things are easy to get wrong.
+
+**You capture from `morse0`, not from the monitor interface.** The monitor
+interface (`mon0`) is created and used to set the channel, but the packets come
+off `morse0`. That is unintuitive and is the single most common way this fails.
+
+**`morse0` only exists if the driver was built with `CONFIG_MORSE_MONITOR=y`,
+and Kconfig defaults it to `n`:**
+
+```
+config MORSE_MONITOR
+	bool "Monitor mode support"
+	default n
+```
+
+With the flag unset, `monitor.o` is never compiled (`morse-$(CONFIG_MORSE_MONITOR) += monitor.o`)
+and `alloc_netdev(0, "morse%d", ...)` in `monitor.c` never runs — so the driver
+loads, associates, and simply has no capture interface. `setup.sh` in this repo
+sets the flag; a stock build will not.
+
+### Channel selection
+
+`morse_cli` takes the **real sub-GHz frequency in kHz**, unlike the NRC7292
+where you set a mapped 2.4 GHz frequency through `iw`:
+
+    morse_cli -i mon0 channel -c 908000 -o 8 -p 2 -n 0
+
+`-c` frequency (kHz), `-o` operating bandwidth (MHz), `-p` primary bandwidth
+(MHz), `-n` primary channel index.
+
+### Capture
+
+    sudo tcpdump -i morse0 -w capture.pcap
+
+The app note recommends Wireshark's **sshdump** extcap for remote capture, with
+the remote interface set to `morse0`. The Wireshark profile in
+[../wireshark/](../wireshark/) already has sshdump settings; point
+`extcap.sshdump.remotecapturecommand` at `morse0` when using the Morse radio
+rather than the NRC7292's `wlan0`.
