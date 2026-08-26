@@ -1,0 +1,5 @@
+*.log
+*.ko
+*.deb
+*.img
+*.img.xz
