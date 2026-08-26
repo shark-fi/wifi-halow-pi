@@ -24,7 +24,9 @@ ALFA's getting-started guide tells you to run:
   build on any current kernel.
 
 **Use [craigpeacock/nrc7292_sw_pkg](https://github.com/craigpeacock/nrc7292_sw_pkg)
-instead.** That fork ships a working 2128-byte AHPI7292S board file
+instead** (mirrored at
+[shark-fi/nrc7292_sw_pkg](https://github.com/shark-fi/nrc7292_sw_pkg), with the
+critical files also kept in [vendor/](vendor/)). That fork ships a working 2128-byte AHPI7292S board file
 (`md5 bbe184e9b5212cddcc520cd0ef7e0cd2`), a 64-bit `cli_app`, and kernel fixes.
 
 ## Which commit to build

@@ -43,10 +43,22 @@ becomes `CONFIG_MM81X_USB=m` with firmware already in linux-firmware under
 `morsemicro/mm81x/`, and the out-of-tree build in [mm8108/](mm8108/) becomes
 unnecessary. The Newracom NRC7292 has no mainline driver and no prospect of one.
 
+## Mirrors
+
+The upstream situation for the NRC7292 is fragile — ALFA's download host is gone
+and Newracom's link to the working board file is dead — so the package is
+mirrored:
+
+- **[shark-fi/nrc7292_sw_pkg](https://github.com/shark-fi/nrc7292_sw_pkg)** —
+  full fork with history, of
+  [craigpeacock/nrc7292_sw_pkg](https://github.com/craigpeacock/nrc7292_sw_pkg)
+- **[nrc7292/vendor/](nrc7292/vendor/)** — the irreplaceable artifacts on their
+  own (AHPI7292S board file, firmware, overlays, GPLv2 license)
+
 ## Layout
 
 ```
-nrc7292/   ALFA AHPI7292S - setup, monitor mode
+nrc7292/   ALFA AHPI7292S - setup, monitor mode, vendored blobs
 mm8108/    Morse MM8108 USB dongle - setup, station mode
 notes/     Kernel packaging defects, compatibility research
 ```
