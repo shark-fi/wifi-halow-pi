@@ -31,7 +31,7 @@
 
 # Directory to start in when opening File Open dialog.
 # A path to a directory
-#gui.fileopen.dir: /Users/marko
+#gui.fileopen.dir: 
 
 # The preview timeout in the File Open dialog
 # A decimal number
