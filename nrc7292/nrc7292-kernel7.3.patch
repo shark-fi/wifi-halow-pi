@@ -1,0 +1,33 @@
+diff --git a/package/src/nrc/nrc-bd.c b/package/src/nrc/nrc-bd.c
+index 6c541c3..5f73990 100644
+--- a/package/src/nrc/nrc-bd.c
++++ b/package/src/nrc/nrc-bd.c
+@@ -500,7 +500,11 @@ struct wim_bd_param * nrc_read_bd_tx_pwr(struct nrc *nw, uint8_t *country_code)
+ 					(bd->data[7 + len + 4*i]<<8));
+ 
+ 			// Add a condition if target version is initial value(65535)
+-			if (target_version == bd_sel->hw_version) {
++			/* This chip reports fwinfo.hw_version 0 (the other AHPI7292S unit
++			 * reported 1). Treat 0 as a wildcard so the correct board entry
++			 * still loads and g_bd_valid is set; without it nrc_op_start
++			 * refuses with -1 and wlan0 never comes up. */
++			if (target_version == bd_sel->hw_version || target_version == 0) {
+ 				nrc_dbg(NRC_DBG_STATE, "target version is matched(%u : %u)",
+ 						target_version, bd_sel->hw_version);
+ 
+diff --git a/package/src/nrc/nrc-trx.c b/package/src/nrc/nrc-trx.c
+index c043437..6d0d93a 100644
+--- a/package/src/nrc/nrc-trx.c
++++ b/package/src/nrc/nrc-trx.c
+@@ -1171,7 +1171,10 @@ static int rx_h_mesh(struct nrc_trx_data *rx)
+ 			is_mesh_action = true;
+ 		} else {
+ 			if (mgmt->u.action.category == WLAN_CATEGORY_MESH_ACTION) {
+-				if (mgmt->u.action.u.mesh_action.action_code ==
++				/* The action code is the byte after the category (802.11 Action
++				 * field). Kernel 7.x moved it from the per-type union into
++				 * u.action, so read it by frame offset to build on both. */
++				if (((u8 *)mgmt)[offsetof(struct ieee80211_mgmt, u.action.category) + 1] ==
+ 					WLAN_MESH_ACTION_HWMP_PATH_SELECTION) {
+ 					is_mesh_action = true;
+ 				}

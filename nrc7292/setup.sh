@@ -52,6 +52,11 @@ else
     DRIVER_REF="$DRIVER_REF_618"
     echo "driver: $DRIVER_REF (6.18-era API)"
 fi
+# Kernel 7.x needs two source patches on top of master (see nrc7292-kernel7.3.patch):
+# an Action-frame union change that stops master compiling, and a board-version
+# fallback for an AHPI7292S unit whose firmware reports hw_version 0.
+APPLY_73_PATCH=0
+[ "$KMAJ" -ge 7 ] && APPLY_73_PATCH=1
 
 say "Installing dependencies"
 sudo apt-get update -qq
@@ -110,11 +115,27 @@ fi
 say "Building driver from $DRIVER_REF"
 cd "$SRC"
 [ "$DRIVER_REF" = "master" ] || git checkout --quiet "$DRIVER_REF"
+if [ "$APPLY_73_PATCH" = 1 ]; then
+    PATCH="$(cd "$(dirname "$0")" && pwd)/nrc7292-kernel7.3.patch"
+    [ -f "$PATCH" ] || die "kernel $KREL needs $PATCH, which is missing"
+    say "Applying kernel 7.x patch"
+    if git apply --check "$PATCH" 2>/dev/null; then
+        git apply "$PATCH" && echo "  applied nrc7292-kernel7.3.patch"
+    elif git -c user.name=x -c user.email=x apply --3way "$PATCH" 2>/dev/null; then
+        echo "  applied with 3-way merge"
+    else
+        warn "Patch did not apply cleanly - upstream has moved. Build may fail on"
+        warn "mgmt->u.action.u.mesh_action (nrc-trx.c) or the board-version check."
+    fi
+fi
 cd "$PKG/src/nrc"
 make clean >/dev/null 2>&1 || true
 make 2>&1 | tee /tmp/nrc-build.log || die "Build failed - see /tmp/nrc-build.log
-       If the errors name timer_delete_sync_try, timer_container_of or
-       ieee80211_emulate_add_chanctx, the source is newer than your kernel."
+       timer_delete_sync_try / timer_container_of / ieee80211_emulate_add_chanctx:
+         source is newer than your kernel - use the matching DRIVER_REF.
+       'struct <anonymous> has no member named u' in nrc-trx.c:
+         kernel 7.x Action-frame change - nrc7292-kernel7.3.patch should have
+         been applied (needs KMAJ>=7 and the patch file alongside setup.sh)."
 cp -f nrc.ko ~/nrc_pkg/sw/driver/
 echo "  $(file -b ~/nrc_pkg/sw/driver/nrc.ko | cut -c1-46)"
 # Leave the tree back on master so update.sh is never run from the old commit.

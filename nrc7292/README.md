@@ -40,6 +40,20 @@ errors about `timer_delete_sync_try`, `timer_container_of`,
 |---|---|
 | 6.6.x | `cce7d1589` — "Add support for v6.2. Tested on v6.6.51" |
 | 6.18.x | `master` |
+| 7.x | `master` + [`nrc7292-kernel7.3.patch`](nrc7292-kernel7.3.patch) (applied automatically by `setup.sh`) |
+
+**Kernel 7.x** (e.g. WLAN Pi OS trixie, `7.3.0-rc5-v8-wlanpi+`) needs two patches on
+top of `master`, both in `nrc7292-kernel7.3.patch`:
+
+- `nrc-trx.c`: 7.x moved an Action frame's `action_code` out of its per-type union
+  into `u.action`, so `mgmt->u.action.u.mesh_action.action_code` no longer compiles
+  (`struct <anonymous> has no member named 'u'`). Read it by frame offset instead.
+- `nrc-bd.c`: one AHPI7292S unit here reports `fwinfo.hw_version` **0** (another
+  reports 1), so the version-1 board entry never matched, `g_bd_valid` stayed false,
+  and `nrc_op_start` refused with `-1` — `wlan0` came up `type monitor` but
+  `ip link set up` failed with EPERM. Treat a reported version of 0 as a wildcard.
+
+Verified on a Raspberry Pi 4 (WLAN Pi OS trixie, kernel 7.3) decoding WLPC-HALOW.
 
 Take **everything else** from `master` regardless — the board file and 64-bit
 `cli_app` only exist there. `setup.sh` handles this split: it runs `update.sh`
